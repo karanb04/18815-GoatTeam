@@ -58,14 +58,18 @@ def join_project():
 # Route for adding a new user
 @app.route('/add_user', methods=['POST'])
 def add_user():
+    print("Received registration request")
     data = request.get_json()
+    print(f"Data received: {data}")
     username = data.get('username')
     userId = data.get('userId')
     password = data.get('password')
     
     if usersDB.addUser(None, username, userId, password):
+        print("User created successfully")
         return jsonify({'success': True})
     
+    print("User creation failed")
     return jsonify({'error': 'User already exists'}), 409
 
 # Route for getting the list of user projects
@@ -187,4 +191,4 @@ def check_inventory():
 # Main entry point for the application
 if __name__ == '__main__':
     init_all_dbs()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
