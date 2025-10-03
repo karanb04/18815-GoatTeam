@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 function MyRegistrationPage() {
 	const [formData, setFormData] = useState({
 		username: "",
-		userId: "",
 		password: "",
 		confirmPassword: "",
 	});
@@ -37,7 +36,6 @@ function MyRegistrationPage() {
 				},
 				body: JSON.stringify({
 					username: formData.username,
-					userId: formData.userId,
 					password: formData.password,
 				}),
 			});
@@ -73,18 +71,6 @@ function MyRegistrationPage() {
 							id="username"
 							name="username"
 							value={formData.username}
-							onChange={handleChange}
-							required
-						/>
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="userId">User ID:</label>
-						<input
-							type="text"
-							id="userId"
-							name="userId"
-							value={formData.userId}
 							onChange={handleChange}
 							required
 						/>

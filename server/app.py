@@ -31,26 +31,25 @@ def init_all_dbs():
 def login():
     data = request.get_json()
     username = data.get('username')
-    userId = data.get('userId')
     password = data.get('password')
     
-    if usersDB.login(None, username, userId, password):
-        return jsonify({'success': True, 'user': {'username': username, 'userId': userId}})
+    if usersDB.login(None, username, password):
+        return jsonify({'success': True, 'user': {'username': username}})
     
     return jsonify({'error': 'Invalid credentials'}), 401
 
 # Route for the main page
 @app.route('/main')
 def mainPage():
-    userId = request.args.get('userId')
-    projects = usersDB.getUserProjectsList(None, userId)
+    username = request.args.get('username')
+    projects = usersDB.getUserProjectsList(None, username)
     return jsonify({'projects': projects})
 
 # Route for joining a project
 @app.route('/join_project', methods=['POST'])
 def join_project():
     data = request.get_json()
-    userId = data.get('userId')
+    username = data.get('username')
     projectId = data.get('projectId')
     
     # Check if project exists
@@ -59,7 +58,7 @@ def join_project():
         return jsonify({'error': 'Project not found'}), 404
     
     # Add user to project and project to user
-    if projectsDB.addUser(None, projectId, userId) and usersDB.joinProject(None, userId, projectId):
+    if projectsDB.addUser(None, projectId, username) and usersDB.joinProject(None, username, projectId):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Failed to join project'}), 400
@@ -71,10 +70,9 @@ def add_user():
     data = request.get_json()
     print(f"Data received: {data}")
     username = data.get('username')
-    userId = data.get('userId')
     password = data.get('password')
     
-    if usersDB.addUser(None, username, userId, password):
+    if usersDB.addUser(None, username, password):
         print("User created successfully")
         return jsonify({'success': True})
     
@@ -85,9 +83,9 @@ def add_user():
 @app.route('/get_user_projects_list', methods=['POST'])
 def get_user_projects_list():
     data = request.get_json()
-    userId = data.get('userId')
+    username = data.get('username')
     
-    projects = usersDB.getUserProjectsList(None, userId)
+    projects = usersDB.getUserProjectsList(None, username)
     project_details = []
     
     for projectId in projects:
@@ -104,12 +102,12 @@ def create_project():
     projectName = data.get('projectName')
     projectId = data.get('projectId')
     description = data.get('description', '')
-    userId = data.get('userId')
+    username = data.get('username')
     
     if projectsDB.createProject(None, projectName, projectId, description):
         # Add creator to project
-        projectsDB.addUser(None, projectId, userId)
-        usersDB.joinProject(None, userId, projectId)
+        projectsDB.addUser(None, projectId, username)
+        usersDB.joinProject(None, username, projectId)
         return jsonify({'success': True})
     
     return jsonify({'error': 'Project ID already exists'}), 409
@@ -151,9 +149,9 @@ def check_out():
     projectId = data.get('projectId')
     hwSetName = data.get('hwSetName')
     qty = data.get('qty')
-    userId = data.get('userId')
+    username = data.get('username')
     
-    if projectsDB.checkOutHW(None, projectId, hwSetName, qty, userId):
+    if projectsDB.checkOutHW(None, projectId, hwSetName, qty, username):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Insufficient hardware or invalid request'}), 400
@@ -165,9 +163,9 @@ def check_in():
     projectId = data.get('projectId')
     hwSetName = data.get('hwSetName')
     qty = data.get('qty')
-    userId = data.get('userId')
+    username = data.get('username')
     
-    if projectsDB.checkInHW(None, projectId, hwSetName, qty, userId):
+    if projectsDB.checkInHW(None, projectId, hwSetName, qty, username):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Cannot check in more than checked out'}), 400

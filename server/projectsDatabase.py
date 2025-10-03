@@ -43,13 +43,13 @@ def createProject(client, projectName, projectId, description):
         conn.close()
         return False
 
-def addUser(client, projectId, userId):
+def addUser(client, projectId, username):
     conn = get_connection()
     project = conn.execute('SELECT users FROM projects WHERE projectId = ?', (projectId,)).fetchone()
     if project:
         users = json.loads(project['users'])
-        if userId not in users:
-            users.append(userId)
+        if username not in users:
+            users.append(username)
             conn.execute('UPDATE projects SET users = ? WHERE projectId = ?',
                         (json.dumps(users), projectId))
             conn.commit()
@@ -62,7 +62,7 @@ def updateUsage(client, projectId, hwSetName):
     # This function updates hardware usage tracking
     return True
 
-def checkOutHW(client, projectId, hwSetName, qty, userId):
+def checkOutHW(client, projectId, hwSetName, qty, username):
     # Check if hardware is available
     if hardwareDB.requestSpace(client, hwSetName, qty):
         # Update project's hardware usage
@@ -78,7 +78,7 @@ def checkOutHW(client, projectId, hwSetName, qty, userId):
         return True
     return False
 
-def checkInHW(client, projectId, hwSetName, qty, userId):
+def checkInHW(client, projectId, hwSetName, qty, username):
     conn = get_connection()
     project = conn.execute('SELECT hwSets FROM projects WHERE projectId = ?', (projectId,)).fetchone()
     
