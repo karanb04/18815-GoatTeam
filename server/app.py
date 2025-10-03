@@ -9,7 +9,16 @@ import hardwareDatabase as hardwareDB
 
 # Initialize a new Flask web application
 app = Flask(__name__)
-CORS(app)
+
+# Configure CORS to allow requests from localhost
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 # Initialize databases
 def init_all_dbs():
@@ -191,4 +200,4 @@ def check_inventory():
 # Main entry point for the application
 if __name__ == '__main__':
     init_all_dbs()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=4321)
