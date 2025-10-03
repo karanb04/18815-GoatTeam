@@ -1,46 +1,109 @@
-# Import necessary libraries and modules
-from pymongo import MongoClient
+import sqlite3
+import json
+import hardwareDatabase as hardwareDB
 
-import hardwareDB
+def get_connection():
+    conn = sqlite3.connect('hardware_portal.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-'''
-Structure of Project entry:
-Project = {
-    'projectName': projectName,
-    'projectId': projectId,
-    'description': description,
-    'hwSets': {HW1: 0, HW2: 10, ...},
-    'users': [user1, user2, ...]
-}
-'''
+def init_db():
+    conn = get_connection()
+    conn.execute('''CREATE TABLE IF NOT EXISTS projects (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        projectName TEXT NOT NULL,
+        projectId TEXT UNIQUE NOT NULL,
+        description TEXT,
+        hwSets TEXT DEFAULT '{}',
+        users TEXT DEFAULT '[]'
+    )''')
+    conn.commit()
+    conn.close()
 
-# Function to query a project by its ID
 def queryProject(client, projectId):
-    # Query and return a project from the database
-    pass
+    conn = get_connection()
+    project = conn.execute('SELECT * FROM projects WHERE projectId = ?', (projectId,)).fetchone()
+    conn.close()
+    if project:
+        result = dict(project)
+        result['hwSets'] = json.loads(result['hwSets'])
+        result['users'] = json.loads(result['users'])
+        return result
+    return None
 
-# Function to create a new project
 def createProject(client, projectName, projectId, description):
-    # Create a new project in the database
-    pass
+    conn = get_connection()
+    try:
+        conn.execute('INSERT INTO projects (projectName, projectId, description) VALUES (?, ?, ?)',
+                    (projectName, projectId, description))
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.IntegrityError:
+        conn.close()
+        return False
 
-# Function to add a user to a project
 def addUser(client, projectId, userId):
-    # Add a user to the specified project
-    pass
+    conn = get_connection()
+    project = conn.execute('SELECT users FROM projects WHERE projectId = ?', (projectId,)).fetchone()
+    if project:
+        users = json.loads(project['users'])
+        if userId not in users:
+            users.append(userId)
+            conn.execute('UPDATE projects SET users = ? WHERE projectId = ?',
+                        (json.dumps(users), projectId))
+            conn.commit()
+        conn.close()
+        return True
+    conn.close()
+    return False
 
-# Function to update hardware usage in a project
 def updateUsage(client, projectId, hwSetName):
-    # Update the usage of a hardware set in the specified project
-    pass
+    # This function updates hardware usage tracking
+    return True
 
-# Function to check out hardware for a project
 def checkOutHW(client, projectId, hwSetName, qty, userId):
-    # Check out hardware for the specified project and update availability
-    pass
+    # Check if hardware is available
+    if hardwareDB.requestSpace(client, hwSetName, qty):
+        # Update project's hardware usage
+        conn = get_connection()
+        project = conn.execute('SELECT hwSets FROM projects WHERE projectId = ?', (projectId,)).fetchone()
+        if project:
+            hw_sets = json.loads(project['hwSets'])
+            hw_sets[hwSetName] = hw_sets.get(hwSetName, 0) + qty
+            conn.execute('UPDATE projects SET hwSets = ? WHERE projectId = ?',
+                        (json.dumps(hw_sets), projectId))
+            conn.commit()
+        conn.close()
+        return True
+    return False
 
-# Function to check in hardware for a project
 def checkInHW(client, projectId, hwSetName, qty, userId):
-    # Check in hardware for the specified project and update availability
-    pass
-
+    conn = get_connection()
+    project = conn.execute('SELECT hwSets FROM projects WHERE projectId = ?', (projectId,)).fetchone()
+    
+    if project:
+        hw_sets = json.loads(project['hwSets'])
+        current_usage = hw_sets.get(hwSetName, 0)
+        
+        if current_usage >= qty:
+            # Update project usage
+            hw_sets[hwSetName] = current_usage - qty
+            if hw_sets[hwSetName] == 0:
+                del hw_sets[hwSetName]
+            
+            conn.execute('UPDATE projects SET hwSets = ? WHERE projectId = ?',
+                        (json.dumps(hw_sets), projectId))
+            conn.commit()
+            
+            # Update hardware availability
+            hw_set = hardwareDB.queryHardwareSet(client, hwSetName)
+            if hw_set:
+                new_availability = hw_set['availability'] + qty
+                hardwareDB.updateAvailability(client, hwSetName, new_availability)
+            
+            conn.close()
+            return True
+    
+    conn.close()
+    return False

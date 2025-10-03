@@ -1,37 +1,68 @@
-# Import necessary libraries and modules
-from pymongo import MongoClient
+import sqlite3
 
-'''
-Structure of Hardware Set entry:
-HardwareSet = {
-    'hwName': hwSetName,
-    'capacity': initCapacity,
-    'availability': initCapacity
-}
-'''
+def get_connection():
+    conn = sqlite3.connect('hardware_portal.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-# Function to create a new hardware set
+def init_db():
+    conn = get_connection()
+    conn.execute('''CREATE TABLE IF NOT EXISTS hardware_sets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hwName TEXT UNIQUE NOT NULL,
+        capacity INTEGER NOT NULL,
+        availability INTEGER NOT NULL
+    )''')
+    
+    # Add default hardware sets
+    conn.execute('INSERT OR IGNORE INTO hardware_sets (hwName, capacity, availability) VALUES ("HWSet1", 100, 100)')
+    conn.execute('INSERT OR IGNORE INTO hardware_sets (hwName, capacity, availability) VALUES ("HWSet2", 100, 100)')
+    
+    conn.commit()
+    conn.close()
+
 def createHardwareSet(client, hwSetName, initCapacity):
-    # Create a new hardware set in the database
-    pass
+    conn = get_connection()
+    try:
+        conn.execute('INSERT INTO hardware_sets (hwName, capacity, availability) VALUES (?, ?, ?)',
+                    (hwSetName, initCapacity, initCapacity))
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.IntegrityError:
+        conn.close()
+        return False
 
-# Function to query a hardware set by its name
 def queryHardwareSet(client, hwSetName):
-    # Query and return a hardware set from the database
-    pass
+    conn = get_connection()
+    hw_set = conn.execute('SELECT * FROM hardware_sets WHERE hwName = ?', (hwSetName,)).fetchone()
+    conn.close()
+    return dict(hw_set) if hw_set else None
 
-# Function to update the availability of a hardware set
 def updateAvailability(client, hwSetName, newAvailability):
-    # Update the availability of an existing hardware set
-    pass
+    conn = get_connection()
+    conn.execute('UPDATE hardware_sets SET availability = ? WHERE hwName = ?',
+                (newAvailability, hwSetName))
+    conn.commit()
+    conn.close()
+    return True
 
-# Function to request space from a hardware set
 def requestSpace(client, hwSetName, amount):
-    # Request a certain amount of hardware and update availability
-    pass
+    conn = get_connection()
+    hw_set = conn.execute('SELECT availability FROM hardware_sets WHERE hwName = ?',
+                         (hwSetName,)).fetchone()
+    if hw_set and hw_set['availability'] >= amount:
+        new_availability = hw_set['availability'] - amount
+        conn.execute('UPDATE hardware_sets SET availability = ? WHERE hwName = ?',
+                    (new_availability, hwSetName))
+        conn.commit()
+        conn.close()
+        return True
+    conn.close()
+    return False
 
-# Function to get all hardware set names
 def getAllHwNames(client):
-    # Get and return a list of all hardware set names
-    pass
-
+    conn = get_connection()
+    hw_sets = conn.execute('SELECT hwName FROM hardware_sets').fetchall()
+    conn.close()
+    return [hw['hwName'] for hw in hw_sets]
