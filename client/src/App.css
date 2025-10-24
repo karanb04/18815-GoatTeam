@@ -206,3 +206,497 @@ body {
 .card button:not(:disabled):hover {
   background-color: #a04600;
 }
+
+/* Portal Navigation */
+.portal-nav {
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
+.nav-btn {
+  padding: 1rem 2rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background-color: #f8f8f8;
+}
+
+.nav-btn.active {
+  color: #bf5700;
+  border-bottom-color: #bf5700;
+  background-color: #fff8f0;
+}
+
+/* User Management Styles */
+.user-management {
+  padding: 2rem 0;
+}
+
+.management-section h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.create-btn, .join-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.create-btn {
+  background-color: #bf5700;
+  color: white;
+}
+
+.create-btn:hover {
+  background-color: #a04600;
+}
+
+.join-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.join-btn:hover {
+  background-color: #218838;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-buttons button[type="submit"] {
+  background-color: #bf5700;
+  color: white;
+}
+
+.modal-buttons button[type="button"] {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Projects Grid */
+.projects-list h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.project-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.project-card.selected {
+  border: 2px solid #bf5700;
+}
+
+.project-header {
+  padding: 1.5rem;
+}
+
+.project-header h4 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.project-header p {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.project-header .description {
+  font-style: italic;
+  color: #888;
+}
+
+.project-hardware {
+  margin-top: 1rem;
+  font-size: 14px;
+}
+
+.project-hardware strong {
+  color: #bf5700;
+}
+
+.project-details {
+  border-top: 1px solid #eee;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+}
+
+.project-users {
+  margin-bottom: 1.5rem;
+}
+
+.project-users ul {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.project-users li {
+  padding: 0.25rem 0;
+  color: #666;
+}
+
+/* Hardware Management */
+.hardware-management h5 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.hardware-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hardware-item {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: white;
+}
+
+.hardware-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.hw-name {
+  font-weight: bold;
+  color: #bf5700;
+}
+
+.hw-availability, .hw-project-usage {
+  font-size: 14px;
+  color: #666;
+}
+
+.hardware-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.checkout-section, .checkin-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.checkout-section label, .checkin-section label {
+  min-width: 80px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.checkout-section input, .checkin-section input {
+  width: 80px;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.checkout-section button, .checkin-section button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.checkout-section button {
+  background-color: #28a745;
+  color: white;
+}
+
+.checkout-section button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.checkin-section button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.checkin-section button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Resource Management */
+.resource-management {
+  padding: 2rem 0;
+}
+
+.hardware-inventory h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.hardware-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.hardware-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hardware-card h4 {
+  margin-bottom: 1rem;
+  color: #bf5700;
+}
+
+.hardware-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat label {
+  font-weight: 500;
+  color: #666;
+}
+
+.stat span {
+  color: #333;
+}
+
+.project-hardware-management {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.project-hardware-management h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.project-hw-overview {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.project-hw-overview h4 {
+  margin-bottom: 1rem;
+  color: #bf5700;
+}
+
+.project-hw-overview ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.project-hw-overview li {
+  padding: 0.25rem 0;
+  color: #666;
+}
+
+.hardware-checkout-section h4 {
+  margin-bottom: 1.5rem;
+  color: #bf5700;
+}
+
+.hardware-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.hardware-action-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+}
+
+.hardware-action-card h5 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.hw-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+  color: #666;
+}
+
+.hw-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.checkout-controls, .checkin-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.checkout-controls label, .checkin-controls label {
+  min-width: 120px;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkout-controls input, .checkin-controls input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.checkout-controls button, .checkin-controls button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.checkout-controls button {
+  background-color: #28a745;
+  color: white;
+}
+
+.checkin-controls button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.no-project-selected {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-top: 2rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .portal-main {
+    padding: 1rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hardware-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hardware-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hardware-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .checkout-section, .checkin-section {
+    justify-content: space-between;
+  }
+}
