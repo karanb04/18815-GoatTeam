@@ -81,3 +81,7 @@ This file contains functions for managing users in the database.
 ## Client side
 
 1. Design choices are up to you, but an example directory structure has been provided. 
+
+## Building and Deploying
+1. inside the `/client` folder make sure `npm` is installed and run `npm run build`.
+2. inside the root folder `/` make sure it is commited and then `git push heroku master:main`
