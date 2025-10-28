@@ -1,6 +1,6 @@
 import sqlite3
 import json
-import hardwareDatabase as hardwareDB
+from . import hardwareDatabase as hardwareDB
 
 def get_connection():
     conn = sqlite3.connect('hardware_portal.db')

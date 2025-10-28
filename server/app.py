@@ -3,9 +3,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # Import custom modules for database interactions
-import usersDatabase as usersDB
-import projectsDatabase as projectsDB
-import hardwareDatabase as hardwareDB
+from . import usersDatabase as usersDB
+from . import projectsDatabase as projectsDB
+from . import hardwareDatabase as hardwareDB
 
 # Initialize a new Flask web application
 app = Flask(__name__)
