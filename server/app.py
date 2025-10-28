@@ -1,30 +1,35 @@
 # Import necessary libraries and modules
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # Import custom modules for database interactions
 from . import usersDatabase as usersDB
 from . import projectsDatabase as projectsDB
 from . import hardwareDatabase as hardwareDB
+import os
 
 # Initialize a new Flask web application
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../client/build', static_url_path='/')
 
-# Configure CORS to allow requests from localhost
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
-    }
-})
+# Configure CORS for React frontend
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:3001"]}})
+
 
 # Initialize databases
 def init_all_dbs():
     usersDB.init_db()
     projectsDB.init_db()
     hardwareDB.init_db()
+
+# Serve React frontend
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        # Always serve index.html for React routing
+        return send_from_directory(app.static_folder, 'index.html')
 
 # Route for user login
 @app.route('/login', methods=['POST'])
@@ -198,4 +203,4 @@ def check_inventory():
 # Main entry point for the application
 if __name__ == '__main__':
     init_all_dbs()
-    app.run(debug=True, host='0.0.0.0', port=4321)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 4321)))
