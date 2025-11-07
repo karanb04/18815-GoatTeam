@@ -73,6 +73,12 @@ def add_user():
     username = data.get('username')
     password = data.get('password')
     
+    # Validate password length
+    MIN_PASSWORD_LENGTH = 8
+    if not password or len(password) < MIN_PASSWORD_LENGTH:
+        print(f"Password validation failed: length {len(password) if password else 0}")
+        return jsonify({'error': f'Password must be at least {MIN_PASSWORD_LENGTH} characters long'}), 400
+    
     if mongoDB.addUser(username, password):
         print("User created successfully")
         return jsonify({'success': True})
