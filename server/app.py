@@ -3,10 +3,10 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # Import custom modules for database interactions
-import sys
+from . import usersDatabase as usersDB
+from . import projectsDatabase as projectsDB
+from . import hardwareDatabase as hardwareDB
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import mongoDatabase as mongoDB
 
 # Initialize a new Flask web application
 app = Flask(__name__, static_folder='../client/build', static_url_path='/')
@@ -30,7 +30,9 @@ else:
 
 # Initialize databases
 def init_all_dbs():
-    mongoDB.init_db()
+    usersDB.init_db()
+    projectsDB.init_db()
+    hardwareDB.init_db()
 
 # Serve React frontend
 @app.route('/', defaults={'path': ''})
@@ -49,7 +51,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    if mongoDB.loginUser(username, password):
+    if usersDB.login(None, username, password):
         return jsonify({'success': True, 'user': {'username': username}})
     
     return jsonify({'error': 'Invalid credentials'}), 401
@@ -58,7 +60,7 @@ def login():
 @app.route('/main')
 def mainPage():
     username = request.args.get('username')
-    projects = mongoDB.getUserProjects(username)
+    projects = usersDB.getUserProjectsList(None, username)
     return jsonify({'projects': projects})
 
 # Route for joining a project
@@ -69,12 +71,12 @@ def join_project():
     projectId = data.get('projectId')
     
     # Check if project exists
-    project = mongoDB.queryProject(projectId)
+    project = projectsDB.queryProject(None, projectId)
     if not project:
         return jsonify({'error': 'Project not found'}), 404
     
     # Add user to project and project to user
-    if mongoDB.joinProject(username, projectId):
+    if projectsDB.addUser(None, projectId, username) and usersDB.joinProject(None, username, projectId):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Failed to join project'}), 400
@@ -88,7 +90,7 @@ def add_user():
     username = data.get('username')
     password = data.get('password')
     
-    if mongoDB.addUser(username, password):
+    if usersDB.addUser(None, username, password):
         print("User created successfully")
         return jsonify({'success': True})
     
@@ -101,11 +103,11 @@ def get_user_projects_list():
     data = request.get_json()
     username = data.get('username')
     
-    projects = mongoDB.getUserProjects(username)
+    projects = usersDB.getUserProjectsList(None, username)
     project_details = []
     
     for projectId in projects:
-        project = mongoDB.queryProject(projectId)
+        project = projectsDB.queryProject(None, projectId)
         if project:
             project_details.append(project)
     
@@ -120,7 +122,10 @@ def create_project():
     description = data.get('description', '')
     username = data.get('username')
     
-    if mongoDB.createProject(projectName, projectId, description, username):
+    if projectsDB.createProject(None, projectName, projectId, description):
+        # Add creator to project
+        projectsDB.addUser(None, projectId, username)
+        usersDB.joinProject(None, username, projectId)
         return jsonify({'success': True})
     
     return jsonify({'error': 'Project ID already exists'}), 409
@@ -131,7 +136,7 @@ def get_project_info():
     data = request.get_json()
     projectId = data.get('projectId')
     
-    project = mongoDB.queryProject(projectId)
+    project = projectsDB.queryProject(None, projectId)
     if project:
         return jsonify(project)
     
@@ -140,7 +145,7 @@ def get_project_info():
 # Route for getting all hardware names
 @app.route('/get_all_hw_names', methods=['POST'])
 def get_all_hw_names():
-    hw_names = mongoDB.getAllHwNames()
+    hw_names = hardwareDB.getAllHwNames(None)
     return jsonify({'hardware_names': hw_names})
 
 # Route for getting hardware information
@@ -149,7 +154,7 @@ def get_hw_info():
     data = request.get_json()
     hwSetName = data.get('hwSetName')
     
-    hw_set = mongoDB.queryHardwareSet(hwSetName)
+    hw_set = hardwareDB.queryHardwareSet(None, hwSetName)
     if hw_set:
         return jsonify(hw_set)
     
@@ -164,7 +169,7 @@ def check_out():
     qty = data.get('qty')
     username = data.get('username')
     
-    if mongoDB.checkOutHW(projectId, hwSetName, qty, username):
+    if projectsDB.checkOutHW(None, projectId, hwSetName, qty, username):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Insufficient hardware or invalid request'}), 400
@@ -178,7 +183,7 @@ def check_in():
     qty = data.get('qty')
     username = data.get('username')
     
-    if mongoDB.checkInHW(projectId, hwSetName, qty, username):
+    if projectsDB.checkInHW(None, projectId, hwSetName, qty, username):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Cannot check in more than checked out'}), 400
@@ -190,7 +195,7 @@ def create_hardware_set():
     hwSetName = data.get('hwSetName')
     capacity = data.get('capacity')
     
-    if mongoDB.createHardwareSet(hwSetName, capacity):
+    if hardwareDB.createHardwareSet(None, hwSetName, capacity):
         return jsonify({'success': True})
     
     return jsonify({'error': 'Hardware set already exists'}), 409
@@ -199,7 +204,13 @@ def create_hardware_set():
 @app.route('/api/inventory', methods=['GET'])
 def check_inventory():
     # Get all hardware sets and their current usage
-    inventory = mongoDB.getInventory()
+    hw_names = hardwareDB.getAllHwNames(None)
+    inventory = {}
+    
+    for hw_name in hw_names:
+        hw_set = hardwareDB.queryHardwareSet(None, hw_name)
+        inventory[hw_name] = hw_set
+    
     return jsonify({'inventory': inventory})
 
 # Main entry point for the application
