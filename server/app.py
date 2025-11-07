@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # Import custom modules for database interactions
-from . import mongoDatabase as mongoDB
+import mongoDatabase as mongoDB
 import os
 
 # Initialize a new Flask web application
