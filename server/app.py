@@ -3,8 +3,10 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # Import custom modules for database interactions
-import mongoDatabase as mongoDB
+import sys
 import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import mongoDatabase as mongoDB
 
 # Initialize a new Flask web application
 app = Flask(__name__, static_folder='../client/build', static_url_path='/')
