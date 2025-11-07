@@ -12,7 +12,20 @@ import mongoDatabase as mongoDB
 app = Flask(__name__, static_folder='../client/build', static_url_path='/')
 
 # Configure CORS for React frontend
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:3001"]}})
+# Allow both development and production origins
+allowed_origins = [
+    "http://localhost:3000", 
+    "http://localhost:3001",
+    "https://*.herokuapp.com"
+]
+
+# For production, allow all origins if no specific domain is set
+if os.environ.get('PORT'):
+    # Running on Heroku - allow all origins
+    CORS(app, resources={r"/*": {"origins": "*"}})
+else:
+    # Running locally - restrict to localhost
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:3001"]}})
 
 
 # Initialize databases

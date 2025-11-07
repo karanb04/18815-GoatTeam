@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import hashlib
 import json
+import ssl
 from datetime import datetime
 
 class MongoDatabase:
@@ -15,7 +16,18 @@ class MongoDatabase:
         
     def connect(self):
         try:
-            self.client = MongoClient(self.uri, server_api=ServerApi('1'))
+            # Add SSL configuration for Heroku compatibility
+            self.client = MongoClient(
+                self.uri, 
+                server_api=ServerApi('1'),
+                ssl=True,
+                ssl_cert_reqs=ssl.CERT_NONE,
+                connect=True,
+                serverSelectionTimeoutMS=5000,
+                socketTimeoutMS=20000,
+                connectTimeoutMS=20000,
+                maxPoolSize=1
+            )
             self.client.admin.command('ping')
             self.db = self.client['HardwarePortal']
             print("Successfully connected to MongoDB!")
