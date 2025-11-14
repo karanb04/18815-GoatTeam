@@ -17,7 +17,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-def addUser(client, username, password):
+def addUser(username, password):
     conn = get_connection()
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     try:
@@ -30,21 +30,21 @@ def addUser(client, username, password):
         conn.close()
         return False
 
-def __queryUser(client, username):
+def __queryUser(username):
     conn = get_connection()
     user = conn.execute('SELECT * FROM users WHERE username = ?',
                        (username,)).fetchone()
     conn.close()
     return dict(user) if user else None
 
-def login(client, username, password):
-    user = __queryUser(client, username)
+def login(username, password):
+    user = __queryUser(username)
     if user:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         return user['password'] == hashed_password
     return False
 
-def joinProject(client, username, projectId):
+def joinProject(username, projectId):
     conn = get_connection()
     user = conn.execute('SELECT projects FROM users WHERE username = ?', (username,)).fetchone()
     if user:
@@ -60,7 +60,7 @@ def joinProject(client, username, projectId):
     conn.close()
     return False
 
-def getUserProjectsList(client, username):
+def getUserProjectsList(username):
     conn = get_connection()
     user = conn.execute('SELECT projects FROM users WHERE username = ?', (username,)).fetchone()
     conn.close()
