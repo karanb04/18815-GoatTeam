@@ -96,7 +96,7 @@ def add_user():
         print(f"Password validation failed: length {len(password) if password else 0}")
         return jsonify({'error': f'Password must be at least {MIN_PASSWORD_LENGTH} characters long'}), 400
     
-    if usersDB.addUser(username, password):
+    if usersDB.addUser(None, username, password):
         print("User created successfully")
         return jsonify({'success': True})
     
