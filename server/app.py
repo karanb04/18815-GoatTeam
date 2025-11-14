@@ -47,14 +47,26 @@ def serve_frontend(path):
 # Route for user login
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    
-    if usersDB.login(None, username, password):
-        return jsonify({'success': True, 'user': {'username': username}})
-    
-    return jsonify({'error': 'Invalid credentials'}), 401
+    print("Received login request")
+    try:
+        data = request.get_json()
+        print(f"Login data received: {data}")
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            print("Missing username or password")
+            return jsonify({'error': 'Username and password are required'}), 400
+        
+        if usersDB.login(None, username, password):
+            print(f"Login successful for user: {username}")
+            return jsonify({'success': True, 'user': {'username': username}})
+        
+        print(f"Login failed for user: {username}")
+        return jsonify({'error': 'Invalid credentials'}), 401
+    except Exception as e:
+        print(f"Login error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 # Route for the main page
 @app.route('/main')
@@ -96,7 +108,7 @@ def add_user():
         print(f"Password validation failed: length {len(password) if password else 0}")
         return jsonify({'error': f'Password must be at least {MIN_PASSWORD_LENGTH} characters long'}), 400
     
-    if mongoDB.addUser(username, password):
+    if usersDB.addUser(None, username, password):
         print("User created successfully")
         return jsonify({'success': True})
     
