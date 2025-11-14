@@ -9,7 +9,6 @@ function MyUserPortal() {
   const [hardwareInfo, setHardwareInfo] = useState([]);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showJoinProject, setShowJoinProject] = useState(false);
-  const [activeTab, setActiveTab] = useState('projects');
   const navigate = useNavigate();
 
   const [newProject, setNewProject] = useState({
@@ -217,24 +216,8 @@ function MyUserPortal() {
         </div>
       </header>
 
-      <nav className="portal-nav">
-        <button 
-          className={activeTab === 'projects' ? 'nav-btn active' : 'nav-btn'}
-          onClick={() => setActiveTab('projects')}
-        >
-          User Management
-        </button>
-        <button 
-          className={activeTab === 'hardware' ? 'nav-btn active' : 'nav-btn'}
-          onClick={() => setActiveTab('hardware')}
-        >
-          Resource Management
-        </button>
-      </nav>
-
       <main className="portal-main">
-        {activeTab === 'projects' && (
-          <div className="user-management">
+        <div className="user-management">
             <div className="management-section">
               <h2>User Management</h2>
               
@@ -338,120 +321,6 @@ function MyUserPortal() {
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab === 'hardware' && (
-          <div className="resource-management">
-            <h2>Resource Management</h2>
-            
-            <div className="hardware-inventory">
-              <h3>Hardware Inventory</h3>
-              <div className="hardware-grid">
-                {hardwareInfo.map((hw) => (
-                  <div key={hw.hwName} className="hardware-card">
-                    <h4>{hw.hwName}</h4>
-                    <div className="hardware-stats">
-                      <div className="stat">
-                        <label>Capacity:</label>
-                        <span>{hw.capacity}</span>
-                      </div>
-                      <div className="stat">
-                        <label>Available:</label>
-                        <span>{hw.availability}</span>
-                      </div>
-                      <div className="stat">
-                        <label>In Use:</label>
-                        <span>{hw.capacity - hw.availability}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {selectedProject && (
-              <div className="project-hardware-management">
-                <h3>Hardware Management for {selectedProject.projectName}</h3>
-                <div className="project-hw-overview">
-                  <h4>Current Project Hardware Usage:</h4>
-                  {Object.keys(selectedProject.hwSets || {}).length === 0 ? (
-                    <p>No hardware currently checked out for this project.</p>
-                  ) : (
-                    <ul>
-                      {Object.entries(selectedProject.hwSets || {}).map(([hwName, qty]) => (
-                        <li key={hwName}>{hwName}: {qty} units</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="hardware-checkout-section">
-                  <h4>Checkout/Checkin Hardware:</h4>
-                  <div className="hardware-actions-grid">
-                    {hardwareInfo.map((hw) => (
-                      <div key={hw.hwName} className="hardware-action-card">
-                        <h5>{hw.hwName}</h5>
-                        <div className="hw-stats">
-                          <span>Available: {hw.availability}</span>
-                          <span>Project Usage: {selectedProject.hwSets?.[hw.hwName] || 0}</span>
-                        </div>
-                        <div className="hw-actions">
-                          <div className="checkout-controls">
-                            <label>Checkout Quantity:</label>
-                            <input 
-                              type="number" 
-                              min="1" 
-                              max={hw.availability}
-                              placeholder="0"
-                              id={`checkout-${hw.hwName}`}
-                            />
-                            <button 
-                              onClick={() => {
-                                const qty = parseInt(document.getElementById(`checkout-${hw.hwName}`).value);
-                                if (qty > 0) {
-                                  handleCheckout(selectedProject.projectId, hw.hwName, qty, user.username);
-                                  document.getElementById(`checkout-${hw.hwName}`).value = '';
-                                }
-                              }}
-                            >
-                              Checkout
-                            </button>
-                          </div>
-                          <div className="checkin-controls">
-                            <label>Checkin Quantity:</label>
-                            <input 
-                              type="number" 
-                              min="1" 
-                              max={selectedProject.hwSets?.[hw.hwName] || 0}
-                              placeholder="0"
-                              id={`checkin-${hw.hwName}`}
-                            />
-                            <button 
-                              onClick={() => {
-                                const qty = parseInt(document.getElementById(`checkin-${hw.hwName}`).value);
-                                if (qty > 0) {
-                                  handleCheckin(selectedProject.projectId, hw.hwName, qty, user.username);
-                                  document.getElementById(`checkin-${hw.hwName}`).value = '';
-                                }
-                              }}
-                            >
-                              Checkin
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {!selectedProject && (
-              <div className="no-project-selected">
-                <p>Select a project from the User Management tab to check out/in hardware.</p>
-              </div>
-            )}
-          </div>
-        )}
       </main>
     </div>
   );
